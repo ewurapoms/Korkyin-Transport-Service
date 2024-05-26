@@ -1,0 +1,118 @@
+# Initialize the react project
+npx create-react-app korkyin-frontend
+cd korkyin-frontend
+
+# Install dependencies
+npm install axios react-router-dom @material-ui/core formik yup
+
+# Create LandingPage.js
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+const LandingPage = () => {
+  return (
+    <div>
+      <h1>Welcome to Korkyin</h1>
+      <Link to="/signup/user">Sign Up as Rider</Link>
+      <Link to="/signup/employer">Sign Up as Employer</Link>
+    </div>
+  );
+};
+
+export default LandingPage;
+
+# Create UserSignup.js and EmployerSignup.js components
+import React from 'react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import axios from 'axios';
+
+const UserSignup = () => {
+  const formik = useFormik({
+    initialValues: {
+      name: '',
+      age: '',
+      gender: '',
+      email: '',
+      education: '',
+      interest: '',
+      paymentType: '',
+    },
+    validationSchema: Yup.object({
+      name: Yup.string().required('Required'),
+      email: Yup.string().email('Invalid email address').required('Required'),
+    }),
+    onSubmit: values => {
+      axios.post('http://localhost:5000/api/signup/user', values)
+        .then(response => {
+          alert('Signup successful');
+        })
+        .catch(error => {
+          console.error('There was an error signing up!', error);
+        });
+    },
+  });
+
+  return (
+    <form onSubmit={formik.handleSubmit}>
+      {/* Form fields for name, age, gender, email, education, interest, paymentType */}
+      <button type="submit">Submit</button>
+    </form>
+  );
+};
+
+export default UserSignup;
+
+const EmployerSignup = () => {
+  const formik = useFormik({
+    initialValues: {
+      companyName: '',
+      location: '',
+      contactInfo: '',
+      interestType: '',
+    },
+    validationSchema: Yup.object({
+      companyName: Yup.string().required('Required'),
+      contactInfo: Yup.string().email('Invalid email address').required('Required'),
+    }),
+    onSubmit: values => {
+      axios.post('http://localhost:5000/api/signup/employer', values)
+        .then(response => {
+          alert('Signup successful');
+        })
+        .catch(error => {
+          console.error('There was an error signing up!', error);
+        });
+    },
+  });
+
+  return (
+    <form onSubmit={formik.handleSubmit}>
+      {/* Form fields for companyName, location, contactInfo, interestType */}
+      <button type="submit">Submit</button>
+    </form>
+  );
+};
+
+export default EmployerSignup;
+
+# Update App.js
+import React from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import LandingPage from './LandingPage';
+import UserSignup from './UserSignup';
+import EmployerSignup from './EmployerSignup';
+
+function App() {
+  return (
+    <Router>
+      <Switch>
+        <Route exact path="/" component={LandingPage} />
+        <Route path="/signup/user" component={UserSignup} />
+        <Route path="/signup/employer" component={EmployerSignup} />
+      </Switch>
+    </Router>
+  );
+}
+
+export default App;
